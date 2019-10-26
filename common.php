@@ -5401,9 +5401,13 @@ function ewww_image_optimizer_resize_upload( $file ) {
 		ewwwio_debug_message( 'not an image, cannot resize' );
 		return false;
 	}
-	// Check file size (dimensions).
+	// Get file size (dimensions).
 	list( $oldwidth, $oldheight ) = getimagesize( $file );
-	if ( $oldwidth <= $maxwidth && $oldheight <= $maxheight ) {
+	// Allow resizing (i.e. recompressing) the image, even when it's smaller than the max size?
+	$recompress_originals = defined( 'EWWW_IMAGE_OPTIMIZER_RECOMPRESS_ORIGINALS' ) ? EWWW_IMAGE_OPTIMIZER_RECOMPRESS_ORIGINALS : false;
+	$recompress_originals = apply_filters( 'ewww_image_optimizer__recompress_original', $recompress_originals, $file, $oldwidth, $oldheight );
+	// Check file size (dimensions).
+	if ( $oldwidth <= $maxwidth && $oldheight <= $maxheight && ! $recompress_originals ) {
 		ewwwio_debug_message( 'image too small for resizing' );
 		if ( $oldwidth && $oldheight ) {
 			return array( $oldwidth, $oldheight );
